@@ -144,3 +144,7 @@ html {
 .animate-spin-slow {
   animation: spin-slow 10s linear infinite;
 }
+
+.will-change-transform {
+  will-change: transform;
+}
