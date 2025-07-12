@@ -13,7 +13,7 @@ const TechnicalDrawing: React.FC<TechnicalDrawingProps> = ({
         // The main container div for the SVG, applying responsive positioning and opacity.
         // 'will-change-transform' is added for potential animation performance.
         // Positioning adjusted to better match the image's general placement.
-        <div className={` ${className} will-change-transform absolute bottom-8 sm:bottom-12 md:bottom-8 p-3 right-1/5 sm:right-1/3 md:right-34`}>
+        <div className={` ${className} will-change-transform absolute bottom-8 sm:bottom-12 md:bottom-8 p-3 right-1/5 sm:right-1/3 md:right-34 lg:left-10/18`}>
             <svg
                 viewBox="0 0 1400 600"
                 className="w-full h-full max-w-screen-xl max-h-[600px]" // Ensure responsiveness and max size
@@ -31,35 +31,35 @@ const TechnicalDrawing: React.FC<TechnicalDrawingProps> = ({
                 {/* Curved construction lines - Refined with more control points for more complex curves */}
                 {/* Each path now uses multiple cubic Bezier segments (C) to create a more organic, multi-point curve,
             similar to the hand-drawn feel of the reference image. */}
-                <path d="M 200 100 C 250 30, 350 70, 400 120 S 500 200, 600 250" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" />
-                <path d="M 800 100 C 850 30, 950 70, 1000 120 S 1100 200, 1200 290" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" />
-                <path d="M 150 400 C 200 470, 300 430, 350 380 S 450 320, 550 300" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" />
-                <path d="M 850 400 C 900 470, 1000 430, 1050 380 S 1150 200, 1290 140" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" />
-                <path d="M 400 50 C 450 0, 550 50, 600 100 S 650 150, 700 200" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" />
-                <path d="M 700 200 C 750 250, 850 350, 900 400 S 950 450, 1000 500" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" />
-                <path d="M 500 550 C 550 600, 650 550, 700 500 S 750 450, 800 400" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" />
-                <path d="M 600 250 C 650 300, 750 400, 800 450 S 850 500, 900 550" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" />
+                <path d="M 200 100 C 250 30, 350 70, 400 120 S 500 200, 600 250" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" className='animated-dash' />
+                <path d="M 800 100 C 850 30, 950 70, 1000 120 S 1100 200, 1200 290" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" className='animated-dash'/>
+                <path d="M 150 400 C 200 470, 300 430, 350 380 S 450 320, 550 300" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" className='animated-dash'/>
+                <path d="M 850 400 C 900 470, 1000 430, 1050 380 S 1150 200, 1290 140" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" className='animated-dash'/>
+                <path d="M 400 50 C 450 0, 550 50, 600 100 S 650 150, 700 200" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" className='animated-dash'/>
+                <path d="M 700 200 C 750 250, 850 350, 900 400 S 950 450, 1000 500" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" className='animated-dash'/>
+                <path d="M 500 550 C 550 600, 650 550, 700 500 S 750 450, 800 400" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" className='animated-dash'/>
+                <path d="M 600 250 C 650 300, 750 400, 800 450 S 850 500, 900 550" fill="none" stroke="#999" strokeWidth="1" strokeDasharray="8,4" className='animated-dash'/>
 
 
                 {/* Gray rectangular boxes - translucent, no borders, overlapping effect */}
 
                 {/* Top row  */}
 
-                <rect x="253" y="235" width="100" height="65" fill="rgba(128,128,128,0.2)" />
-                <rect x="473" y="190" width="120" height="110" fill="rgba(128,128,128,0.2)" />
-                <rect x="995" y="190" width="120" height="110" fill="rgba(128,128,128,0.2)" />
+                <rect x="253" y="235" width="100" height="65" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
+                <rect x="473" y="190" width="120" height="110" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
+                <rect x="995" y="190" width="120" height="110" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
 
                 {/* Middle row  */}
-                <rect x="353" y="300" width="120" height="110" fill="rgba(128,128,128,0.2)" />
-                <rect x="535" y="240" width="120" height="115" fill="rgba(128,128,128,0.2)" />
-                <rect x="775" y="240" width="120" height="115" fill="rgba(128,128,128,0.2)" />
+                <rect x="353" y="300" width="120" height="110" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
+                <rect x="535" y="240" width="120" height="115" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
+                <rect x="775" y="240" width="120" height="115" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
 
                 {/* Bottom row  */}
-                <rect x="253" y="300" width="100" height="65" fill="rgba(128,128,128,0.2)" />
-                <rect x="473" y="300" width="120" height="110" fill="rgba(128,128,128,0.2)" />
-                <rect x="655" y="300" width="120" height="110" fill="rgba(128,128,128,0.2)" />
-                <rect x="775" y="300" width="120" height="110" fill="rgba(128,128,128,0.2)" />
-                <rect x="940" y="300" width="120" height="110" fill="rgba(128,128,128,0.2)" />
+                <rect x="253" y="300" width="100" height="65" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
+                <rect x="473" y="300" width="120" height="110" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
+                <rect x="655" y="300" width="120" height="110" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
+                <rect x="775" y="300" width="120" height="110" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
+                <rect x="940" y="300" width="120" height="110" fill="rgba(128,128,128,0.2)" className='animated-rect'/>
 
 
                 {/* Small empty squares - adjusted positions to match image */}

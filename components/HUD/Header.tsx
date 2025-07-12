@@ -1,46 +1,60 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
-import { Menu } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import MobileMenuDrawer from "./MobileMenuDrawer";
 
+import {
+  Navbar,
+  NavBody,
+  NavItems,
+  NavbarLogo,
+  NavbarButton,
+  MobileNavHeader,
+  MobileNav,
+} from "@/components/resizable-navbar";
+
+// Internal nav links (mobile menu uses a separate list)
 const navItems = [
-  { label: "About", href: "#about" },
-  { label: "Projects", href: "#projects" },
-  { label: "Contact", href: "#contact" },
-  { label: "Github", href: "github"},
+  { name: "About", link: "#about" },
+  { name: "Projects", link: "#projects" },
+  { name: "Contact", link: "#contact" },
 ];
 
 const Header = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-neutral-200">
-      <div className="w-full max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold font-mono text-black px-6">Avishek.xd</h1>
+    <header className="sticky top-0 z-30">
+      <div className="w-full max-w-6xl mx-auto px-4 py-4 flex items-center">
+        <Navbar>
+          <NavBody>
+            <NavbarLogo />
+            <NavItems items={navItems} />
+            <div className="hidden md:flex items-center gap-4">
+              <a
+                href="https://github.com/AvishekxD"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-md bg-transparent text-black text-sm font-bold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center dark:text-white"
+              >
+                Github
+              </a>
 
-        <nav className="hidden md:flex gap-6 px-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="font-mono text-sm text-black hover:text-pink-600 transition-all"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+              <NavbarButton variant="primary" href="#contact">
+                Contact Me
+              </NavbarButton>
+            </div>
+          </NavBody>
 
-        <div className="md:hidden">
-          <MobileMenuDrawer />
-        </div>
+          <MobileNav>
+            <MobileNavHeader>
+              <NavbarLogo />
+              <div className="md:hidden">
+                <MobileMenuDrawer />
+              </div>
+            </MobileNavHeader>
+          </MobileNav>
+        </Navbar>
       </div>
     </header>
   );

@@ -1,4 +1,14 @@
+"use client";
 import React from 'react';
+
+import { motion } from "framer-motion";
+
+const verticalLines = [
+  290, 330, 370, 410, 450, 530, 570, 610, 650,
+  730, 770, 810, 850, 930, 970, 1010, 1050,
+  1130, 1170, 1210, 1250, 1330, 1370, 1410,
+  1450, 1530, 1570, 1610, 1650
+];
 
 interface SchematicDisplayProps {
  className?: string;
@@ -20,8 +30,8 @@ const SchematicDisplay: React.FC<SchematicDisplayProps> = ({ className, ...props
   <svg
    width="780"
    viewBox="0 0 1920 1080"
-   xmlns="http://www.w3.org/2000/svg"
-   className={`${className}  will-change-transform absolute -top-8 sm:-top-12 md:-top-15 p-3 right-1/5 sm:right-1/3 md:right-1/2`}
+   xmlns="http://www.w3.org/2000/svg" 
+   className={`${className}  will-change-transform absolute -top-8 sm:-top-12 md:-top-15 p-3 right-1/5 sm:right-1/3 md:right-1/2 `} //lg:right-10/19
    {...props}
   >
    {/* Define the repeating brace-like shape in defs for reuse */}
@@ -34,23 +44,31 @@ const SchematicDisplay: React.FC<SchematicDisplayProps> = ({ className, ...props
 
 
    {/* Central dashed horizontal line */}
-   <line x1="0" y1="540" x2="1920" y2="540" strokeDasharray="10 10" className="stroke-gray-700" strokeWidth="1.5" fill="none" />
+   <line x1="0" y1="540" x2="1920" y2="540" strokeDasharray="10, 10" className="stroke-gray-700" strokeWidth="1.5" fill="none" />
 
    {/* Dashed border of the main container */}
    <rect x="250" y="440" width="1420" height="200" strokeDasharray="8, 8" className="stroke-gray-700" strokeWidth="1.5" fill="none" />
 
    {/* Shared classes for shapes and text */}
     <g className="stroke-gray-700 fill-none" strokeWidth="1.5"> 
-    {[290, 330, 370, 410, 450, 530, 570, 610, 650, 730, 770, 810, 850, 930, 970, 1010, 1050, 1130, 1170, 1210, 1250, 1330, 1370, 1410, 1450, 1530, 1570, 1610, 1650].map((xPos, index) => (
-        <line
-        key={`vertical-line-${index}`}
-        x1={xPos}
-        y1="465"
-        x2={xPos}
-        y2="615"
-        className="stroke-zinc-700/80"
+    {verticalLines.map((xPos, index) => (
+        <motion.line
+          key={`vline-${index}`}
+          x1={xPos}
+          y1="465"
+          x2={xPos}
+          y2="615"
+          initial={{ scaleY: 0 }}
+          animate={{ scaleY: 1 }}
+          transition={{
+            delay: index * 0.05,
+            duration: 0.3,
+            ease: "easeInOut"
+          }}
+          style={{ transformOrigin: "top" }}
+          className="stroke-zinc-700/80"
         />
-    ))}
+      ))}
 
     {/* Angled arrow shape - Adjusted to gray stroke */}
     <path d="M 650 745 l 15 15 l -15 15" className="stroke-zinc-600" />

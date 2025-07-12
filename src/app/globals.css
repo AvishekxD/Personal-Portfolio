@@ -148,3 +148,136 @@ html {
 .will-change-transform {
   will-change: transform;
 }
+
+.animated-dash {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: drawline 8s cubic-bezier(0.5, 0.05, 0.25, 1) forwards;
+  transition: stroke 0.4s ease-out;
+}
+
+@keyframes drawline {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animated-rect {
+  opacity: 0;
+  transform: scale(0.95);
+  animation: fadeScaleIn 2s ease-out forwards;
+  animation-delay: 0.4s;
+}
+
+.animated-rect:nth-of-type(1) { animation-delay: 0.2s; }
+.animated-rect:nth-of-type(2) { animation-delay: 0.4s; }
+.animated-rect:nth-of-type(3) { animation-delay: 0.6s; }
+.animated-rect:nth-of-type(4) { animation-delay: 0.7s; }
+.animated-rect:nth-of-type(5) { animation-delay: 0.8s; }
+.animated-rect:nth-of-type(6) { animation-delay: 0.9s; }
+
+@keyframes fadeScaleIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* shooting star button */
+.spark-button {
+  --spark-transition: 0.25s;
+  --spark-duration: 3s;
+  --spark-bg: white;
+  background: var(--spark-bg);
+  padding: 6px 18px;
+  display: grid;
+  border-radius: 9999px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1000px 0 0 hsl(0 0% 90%) inset,
+              0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow var(--spark-transition), background var(--spark-transition),
+              transform var(--spark-transition);
+}
+
+.spark-button:hover {
+  transform: scale(1.05);
+}
+
+.spark-button:hover .spark-backdrop {
+  background: #f1f5f9;
+}
+
+/* Spark Effect */
+.spark-button {
+  --spark-transition: 0.25s;
+  --spark-duration: 3s;
+  --spark-bg: white;
+  background: var(--spark-bg);
+  padding: 6px 18px;
+  display: grid;
+  border-radius: 9999px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1000px 0 0 hsl(0 0% 90%) inset,
+              0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow var(--spark-transition), background var(--spark-transition),
+              transform var(--spark-transition);
+}
+
+.spark-button:hover {
+  transform: scale(1.05);
+}
+
+.spark-button:hover .spark-backdrop {
+  background: #fbfbfb;
+}
+
+.spark-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  mask: linear-gradient(white, transparent 50%);
+  animation: spark-flip calc(var(--spark-duration) * 2) infinite steps(2, end);
+}
+
+@keyframes spark-flip {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.spark-glow::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  aspect-ratio: 1;
+  inset: 0 auto auto 50%;
+  translate: -50% -15%;
+  transform: rotate(-90deg);
+  opacity: 1;
+  background: conic-gradient(from 0deg, transparent 0 340deg, black 360deg);
+  animation: spark-rotate var(--spark-duration) linear infinite both;
+}
+
+@keyframes spark-rotate {
+  to {
+    transform: rotate(90deg);
+  }
+}
+
+.spark-backdrop {
+  position: absolute;
+  inset: 1px;
+  background: var(--spark-bg);
+  border-radius: 9999px;
+  transition: background var(--spark-transition), opacity var(--spark-transition);
+}
+
+.spark-text {
+  z-index: 1;
+  color: #0f172a;
+}
