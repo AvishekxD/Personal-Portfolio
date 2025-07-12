@@ -10,6 +10,7 @@ import BrickHoverReveal from '@/components/HUD/BrickHoverReveal';
 import BrickReveal from '@/components/BrickReveal';
 import BrickRevealCanvas from '@/components/BrickRevealCanvas';
 import CursorTrail from '@/components/CursorTrail';
+import ScrollToTopButton from '@/components/ScrollToTopButton';
 
 
 export const metadata: Metadata = {
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* <CursorTrail /> */}
         <Header />
         {children}
+        <ScrollToTopButton />
       </body>
     </html>
   );

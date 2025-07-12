@@ -106,7 +106,7 @@ const Hero = () => {
             transition={{ delay: 1, duration: 0.8 }}
             className="mt-6"
           >
-            <button className="group bg-black  text-white px-6 py-2 rounded-full text-base sm:text-lg font-semibold shadow-lg transition-transform duration-300 hover:scale-105 relative overflow-hidden">
+            <button className="group bg-black text-white cursor-pointer px-6 py-2 rounded-full text-base sm:text-lg font-semibold shadow-lg transition-transform duration-300 hover:scale-105 relative overflow-hidden">
               <span className="relative z-10 flex justify-center items-center">
                 <ScanlineTextOverlay
                   text="Contact Me"
@@ -117,7 +117,7 @@ const Hero = () => {
                 />
               </span>
 
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-pink-500 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-gray-800 to-zinc-600 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
             </button>
 
           </motion.div>
@@ -125,35 +125,35 @@ const Hero = () => {
 
         {/* right-section */}
         <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      viewport={{ once: true }}
-      className='relative md:ml-auto md:mr-35 mr-4 md:-mt-28 lg:-mt-36 
-                w-[180px] h-[180px] sm:w-[250px] sm:h-[250px] md:w-[405px] md:h-[440px] 
-                overflow-hidden rounded-full group shadow-lg'
-    >
-      <motion.div
-        animate={{
-          scale: [1, 1.02, 1],
-        }}
-        transition={{
-          duration: 2.5,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-        className='w-full h-full'
-      >
-        <Image
-          src="/assets/me.jpg"
-          // src="/assets/HackerBoy3.png"
-          alt="avishekxd"
-          width={1280}
-          height={768}
-          className='object-cover w-full h-full group-hover:scale-[1.03] transition-all duration-300 ease-in-out'
-        />
-      </motion.div>
-    </motion.div>
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          viewport={{ once: true }}
+          className='relative md:ml-auto md:mr-35 mr-4 md:-mt-28 lg:-mt-36 
+                    w-[180px] h-[180px] sm:w-[250px] sm:h-[250px] md:w-[405px] md:h-[440px] 
+                    overflow-hidden rounded-full group shadow-lg'
+        >
+          <motion.div
+            animate={{
+              scale: [1, 1.02, 1],
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className='w-full h-full'
+          >
+            <Image
+              src="/assets/me.jpg"
+              // src="/assets/HackerBoy3.png"
+              alt="avishekxd"
+              width={1280}
+              height={768}
+              className='object-cover w-full h-full group-hover:scale-[1.03] transition-all duration-300 ease-in-out'
+            />
+          </motion.div>
+        </motion.div>
       </section>
     </section>
   );
