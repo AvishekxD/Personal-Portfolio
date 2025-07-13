@@ -1,8 +1,8 @@
 import Hero from "@/components/HUD/Hero";
 import AboutSection from "../about";
 import ProjectsSection from "../projects";
-import StatsSection from "../StatsSection";
-
+import StatsSection from "../statsSection";
+import Contact from "../contact";
 
 export default function Home() {
   return (
@@ -11,6 +11,7 @@ export default function Home() {
       <AboutSection />
       <ProjectsSection />
       <StatsSection />
+      <Contact />
     </main>
   );
 }
