@@ -1,16 +1,16 @@
 "use client";
 
-import HeatMap from "react-calendar-heatmap";
+import HeatMap, { ReactCalendarHeatmapValue } from "react-calendar-heatmap";
 import { format, subDays } from "date-fns";
 import "react-calendar-heatmap/dist/styles.css";
 
 interface HeatmapValue {
     date: string;
-    count: number; 
+    count: number;
 }
 
 interface HeatmapCalendarProps {
-    values: HeatmapValue[]; 
+    values: HeatmapValue[];
 }
 
 export default function HeatmapCalendar({ values }: HeatmapCalendarProps) {
@@ -23,13 +23,17 @@ export default function HeatmapCalendar({ values }: HeatmapCalendarProps) {
                     values={values}
                     showWeekdayLabels={false}
                     classForValue={(value) =>
-                        value?.count ? `heatmap-level-${Math.min(value.count, 4)}` : "heatmap-level-0"
+                        (value as HeatmapValue)?.count
+                            ? `heatmap-level-${Math.min((value as HeatmapValue).count, 4)}`
+                            : "heatmap-level-0"
                     }
-                    tooltipDataAttrs={(value: any) => {
+                    tooltipDataAttrs={(value: ReactCalendarHeatmapValue<string> | undefined): Record<string, string> => {
+                        const date = value?.date ?? "N/A";
+                        const count = (value as HeatmapValue)?.count ?? 0;
                         return {
                             "data-tooltip-id": "heatmap-tooltip",
-                            "data-tooltip-content": `${value?.date ?? "N/A"} — ${value?.count ?? 0} contributions`
-                        } as { [key: string]: string };
+                            "data-tooltip-content": `${date} — ${count} contributions`,
+                        };
                     }}
                 />
             </div>

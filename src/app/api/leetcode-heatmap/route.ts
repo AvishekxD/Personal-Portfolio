@@ -17,7 +17,7 @@ interface LeetcodeGraphQLResponse {
     data?: {
         matchedUser?: LeetcodeMatchedUser;
     };
-    errors?: any[];
+    errors?: { message: string }[];
 }
 
 interface DailyCount {
@@ -63,10 +63,13 @@ export async function GET() {
         });
 
         if (!res.ok) {
-            const errorDetails = await res.text();
-            console.error(`Failed to fetch from LeetCode GraphQL: Status ${res.status} - ${res.statusText}. Details: ${errorDetails}`);
+            const errorText = await res.text();
+            console.error(`Failed to fetch: ${res.status} - ${res.statusText} - ${errorText}`);
             return NextResponse.json(
-                { error: "Failed to fetch from LeetCode", details: `Status: ${res.status}, Message: ${res.statusText}` },
+                {
+                    error: "Failed to fetch from LeetCode",
+                    details: errorText,
+                },
                 { status: res.status }
             );
         }
@@ -74,53 +77,51 @@ export async function GET() {
         const data: LeetcodeGraphQLResponse = await res.json();
 
         if (data.errors && data.errors.length > 0) {
-            console.error("LeetCode GraphQL errors:", data.errors);
+            console.error("GraphQL errors:", data.errors);
             return NextResponse.json(
-                { error: "LeetCode GraphQL query failed", details: data.errors },
+                { error: "LeetCode GraphQL returned errors", details: data.errors },
                 { status: 500 }
             );
         }
 
-        if (
-            !data.data?.matchedUser?.userCalendar ||
-            typeof data.data.matchedUser.userCalendar.submissionCalendar !== 'string'
-        ) {
-            console.error("LeetCode GraphQL response structure unexpected or submissionCalendar missing/not a string.", data);
+        const calendarString = data.data?.matchedUser?.userCalendar?.submissionCalendar;
+
+        if (!calendarString || typeof calendarString !== "string") {
+            console.error("submissionCalendar missing or invalid", data);
             return NextResponse.json(
-                {
-                    error: "Unexpected LeetCode GraphQL response structure or missing data",
-                    details: data,
-                },
+                { error: "submissionCalendar missing or invalid", details: data },
                 { status: 500 }
             );
         }
 
-        const raw: LeetcodeRawSubmissionCalendar = JSON.parse(data.data.matchedUser.userCalendar.submissionCalendar);
+        const raw: LeetcodeRawSubmissionCalendar = JSON.parse(calendarString);
 
-        const daily: DailyCount[] = Object.entries(raw).map(([timestamp, count]) => ({
-            date: new Date(Number(timestamp) * 1000).toISOString().split("T")[0],
-            count: Number(count),
-        }));
+        const daily: DailyCount[] = Object.entries(raw)
+            .map(([timestamp, count]) => ({
+                date: new Date(Number(timestamp) * 1000).toISOString().split("T")[0],
+                count: Number(count),
+            }))
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
         const weeklyMap: Record<string, number> = {};
-        daily.forEach(({ date, count }) => {
-            const week = startOfWeek(parseISO(date)).toISOString().split("T")[0];
+        for (const { date, count } of daily) {
+            const week = startOfWeek(parseISO(date), { weekStartsOn: 1 }).toISOString().split("T")[0];
             weeklyMap[week] = (weeklyMap[week] || 0) + count;
-        });
+        }
 
         const weekly: WeeklyCount[] = Object.entries(weeklyMap)
             .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
             .map(([week, count]) => ({ week, count }));
 
-        return NextResponse.json<LeetcodeHeatmapApiResponse>({
-            daily,
-            weekly,
-        });
+        return NextResponse.json<LeetcodeHeatmapApiResponse>({ daily, weekly });
     } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : "Unknown error";
-        console.error("LeetCode API error:", errorMessage);
+        console.error("Unexpected error:", errorMessage);
         return NextResponse.json(
-            { error: "Unexpected server error", details: errorMessage },
+            {
+                error: "Unexpected server error",
+                details: errorMessage,
+            },
             { status: 500 }
         );
     }
