@@ -288,7 +288,7 @@ export default function UserProfileCard({ user }: UserProfileCardProps) {
     }, []);
 
     return (
-        <div className="w-full max-w-[950px] bg-zinc-200/10 rounded-2xl px-14 py-10 flex justify-between items-center shadow-md flex-col sm:flex-row gap-6 sm:gap-0 relative overflow-hidden">
+        <div className="w-full z-10 max-w-[950px] bg-zinc-200/10 rounded-2xl px-14 py-10 flex justify-between items-center shadow-md flex-col sm:flex-row gap-6 sm:gap-0 relative overflow-hidden">
 
             <canvas
                 ref={canvasRef}

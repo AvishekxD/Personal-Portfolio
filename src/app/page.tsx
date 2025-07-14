@@ -3,6 +3,8 @@ import AboutSection from "../about";
 import ProjectsSection from "../projects";
 import Statspage from "../statspage";
 import Contact from "../contact";
+import Footer from "@/components/HUD/Footer";
+
 
 export default function Home() {
   return (
@@ -12,6 +14,7 @@ export default function Home() {
       <ProjectsSection />
       <Statspage />
       <Contact />
+      <Footer />
     </main>
   );
 }

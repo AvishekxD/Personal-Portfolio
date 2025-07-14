@@ -321,3 +321,23 @@ html {
   ry: 2px;
   transition: fill 0.3s ease, rx 0.3s ease, ry 0.3s ease;
 }
+
+/* meteors */
+
+@theme inline {
+  --animate-meteor-effect: meteor 5s linear infinite;
+  
+  @keyframes meteor {
+    0% {
+      transform: rotate(215deg) translateX(0);
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(215deg) translateX(-500px);
+      opacity: 0;
+    }
+  }
+}

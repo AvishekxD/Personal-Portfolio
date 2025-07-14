@@ -92,10 +92,10 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ className = "" }) => 
                 transition={{ duration: 0.7, ease: "easeOut" }}
                 className="flex flex-col md:flex-row justify-between items-center mx-auto max-w-5xl"
             >
-                <div>
+                <div className="hidden md:block">
                     <DetroitFaultLinePoster />
                 </div>
-                <div className='mr-0 md:mr-14 sm:mt-6 md:-mt-6 '>
+                <div className='mr-0 md:mr-14 sm:mt-6 md:-mt-6 hidden md:block'>
                     <DetroitFaultLinePosterSecond />
                 </div>
             </motion.div>

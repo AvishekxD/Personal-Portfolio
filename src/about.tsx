@@ -19,7 +19,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ className = "" }) => {
         <section
             className={`relative min-h-screen py-16 px-4 sm:px-6 lg:px-8 overflow-hidden mt-10 ${className}`}
         >
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-5xl md:max-w-6xl lg:max-w-7xl pointer-events-none select-none z-0">
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-5xl md:max-w-6xl lg:max-w-7xl pointer-events-none mt-14 md:mt-0 select-none z-0">
                 <RadarDisplay />
             </div>
 

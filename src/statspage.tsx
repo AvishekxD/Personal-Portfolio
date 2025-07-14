@@ -229,7 +229,7 @@ export default function Statspage() {
                     <h1 className="text-[19px] font-semibold font-sans tracking-wide mb-1">Statistics</h1>
                     <span
                         data-tooltip-id="info-tooltip"
-                        data-tooltip-content="Github activity data is limited to the past 365 days - avishekxd"
+                        data-tooltip-content="GitHub and LeetCode heatmap data is limited to the past 365 days – avishekxd"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
