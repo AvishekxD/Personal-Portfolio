@@ -12,7 +12,17 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 
-export default function WeeklyStatsChart({ data }: { data: any[] }) {
+interface ChartDataPoint {
+  label: string;
+  leetcode: number;
+  github: number;
+}
+
+interface WeeklyStatsChartProps {
+  data: ChartDataPoint[];
+}
+
+export default function WeeklyStatsChart({ data }: WeeklyStatsChartProps) {
   const animationDelay = 1700;
 
   return (

@@ -1,6 +1,36 @@
 import { NextResponse } from "next/server";
 import { format, subDays, isAfter } from "date-fns";
 
+interface GithubCommit {
+  sha: string;
+  author: { email: string; name: string };
+  message: string;
+}
+
+interface PushEventPayload {
+  commits?: GithubCommit[];
+}
+
+interface GithubEvent {
+  id: string;
+  type: string;
+  actor: { login: string; display_login: string; };
+  repo: { name: string; };
+  created_at: string;
+  payload: PushEventPayload;
+}
+
+interface WeeklyCommitEntry {
+  date: string;
+  count: number;
+}
+
+interface GithubStatsResponse {
+  totalCommits: number;
+  weeklyCommits: WeeklyCommitEntry[];
+  dailyCommits: Record<string, number>;
+}
+
 export async function GET() {
   try {
     const username = "AvishekxD";
@@ -15,11 +45,13 @@ export async function GET() {
     });
 
     if (!res.ok) {
-      return NextResponse.json({ error: "GitHub API error" }, { status: 500 });
+      console.error(`GitHub API error: ${res.status} ${res.statusText}`);
+      return NextResponse.json({ error: "GitHub API error" }, { status: res.status });
     }
 
-    const events = await res.json();
-    const commits = events.filter((e: any) => e.type === "PushEvent");
+    const events: GithubEvent[] = await res.json();
+
+    const commits = events.filter((e): e is GithubEvent => e.type === "PushEvent");
 
     const now = new Date();
     const twoWeeksAgo = subDays(now, 13);
@@ -33,29 +65,29 @@ export async function GET() {
 
     for (const event of commits) {
       const commitDate = new Date(event.created_at);
-      if (!isAfter(commitDate, twoWeeksAgo)) continue;
-
-      const key = format(commitDate, "yyyy-MM-dd");
-      if (dailyMap[key] !== undefined) {
-        dailyMap[key] += event.payload.commits?.length || 0;
+      if (isAfter(commitDate, twoWeeksAgo) || format(commitDate, "yyyy-MM-dd") === format(twoWeeksAgo, "yyyy-MM-dd")) {
+        const key = format(commitDate, "yyyy-MM-dd");
+        if (dailyMap[key] !== undefined) {
+          dailyMap[key] += event.payload.commits?.length || 0;
+        }
       }
     }
 
-    const weeklyCommits = Object.entries(dailyMap)
+    const weeklyCommits: WeeklyCommitEntry[] = Object.entries(dailyMap)
       .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
       .map(([date, count]) => ({ date, count }));
 
     const totalCommits = commits.reduce(
-      (sum: number, e: any) => sum + (e.payload.commits?.length || 0),
+      (sum: number, e: GithubEvent) => sum + (e.payload.commits?.length || 0),
       0
     );
 
-    return NextResponse.json({
+    return NextResponse.json<GithubStatsResponse>({
       totalCommits,
       weeklyCommits,
       dailyCommits: dailyMap,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("GitHub stats fetch error:", err);
     return NextResponse.json({ error: "Failed to fetch GitHub stats" }, { status: 500 });
   }

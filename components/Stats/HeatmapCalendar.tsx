@@ -4,7 +4,16 @@ import HeatMap from "react-calendar-heatmap";
 import { format, subDays } from "date-fns";
 import "react-calendar-heatmap/dist/styles.css";
 
-export default function HeatmapCalendar({ values }: { values: any[] }) {
+interface HeatmapValue {
+    date: string;
+    count: number; 
+}
+
+interface HeatmapCalendarProps {
+    values: HeatmapValue[]; 
+}
+
+export default function HeatmapCalendar({ values }: HeatmapCalendarProps) {
     return (
         <div className="overflow-x-auto">
             <div className="min-w-[600px]">
@@ -19,7 +28,7 @@ export default function HeatmapCalendar({ values }: { values: any[] }) {
                     tooltipDataAttrs={(value: any) => {
                         return {
                             "data-tooltip-id": "heatmap-tooltip",
-                            "data-tooltip-content": `${value?.date ?? ""} — ${value?.count ?? 0} contributions`
+                            "data-tooltip-content": `${value?.date ?? "N/A"} — ${value?.count ?? 0} contributions`
                         } as { [key: string]: string };
                     }}
                 />

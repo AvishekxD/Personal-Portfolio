@@ -5,37 +5,68 @@ import { motion, AnimatePresence } from "framer-motion";
 import StatCard from "@/components/Stats/StatCard";
 import HeatmapCalendar from "@/components/Stats/HeatmapCalendar";
 import WeeklyStatsChart from "@/components/Stats/WeeklyStatsChart";
-import { subDays, format } from "date-fns";
+import { subDays, format, addDays } from "date-fns";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import UserProfileCard from "@/components/Stats/UserProfileCard";
+
+interface HeatmapValue {
+    date: string;
+    count: number;
+}
 
 type HeatmapType = "leetcode" | "github" | "combined";
 
+interface LeetcodeStats {
+    totalSolved: number;
+    easySolved: number;
+    mediumSolved: number;
+    hardSolved: number;
+    ranking: number;
+    contributionPoints?: number;
+}
+
+interface GithubStats {
+    totalCommits: number;
+    weeklyCommits: Array<{ date: string; count: number }>;
+    dailyCommits: Record<string, number>;
+}
+
+interface LeetcodeHeatmapApiResponse {
+    daily: HeatmapValue[];
+    weekly: Array<{ week: string; count: number }>;
+}
+
+interface ChartDataPoint {
+    label: string;
+    leetcode: number;
+    github: number;
+}
+
 export default function Statspage() {
-    const [leetcode, setLeetcode] = useState<any>(null);
-    const [github, setGithub] = useState<any>(null);
-    const [leetcodeHeatmap, setLeetcodeHeatmap] = useState<any[]>([]);
-    const [githubHeatmap, setGithubHeatmap] = useState<any[]>([]);
+    const [leetcode, setLeetcode] = useState<LeetcodeStats | null>(null);
+    const [github, setGithub] = useState<GithubStats | null>(null);
+    const [leetcodeHeatmap, setLeetcodeHeatmap] = useState<HeatmapValue[]>([]);
+    const [githubHeatmap, setGithubHeatmap] = useState<HeatmapValue[]>([]);
     const [heatmapType, setHeatmapType] = useState<HeatmapType>("combined");
-    const [leetcodeWeekly, setLeetcodeWeekly] = useState<{ week: string, count: number }[]>([]);
+    const [leetcodeWeekly, setLeetcodeWeekly] = useState<Array<{ week: string, count: number }>>([]);
 
     const user = {
         username: "avishekxd",
         img: "/assets/avishekxd.png",
         github: "AvishekxD",
         leetcode: "AvishekzZ",
-        bio: "I begin to take control as the sun rises over.",
+        bio: "The hardest choices require the strongest wills.",
         emoji: "🎈",
     };
-
 
     useEffect(() => {
         async function fetchStats() {
             try {
                 const [leet, leetMapRes, gitStats, gitMap] = await Promise.all([
-                    fetch("/api/leetcode-stats").then(r => r.json()),
-                    fetch("/api/leetcode-heatmap").then(r => r.ok ? r.json() : { daily: [], weekly: [] }),
-                    fetch("/api/github-stats").then(r => r.json()),
-                    fetch("/api/github-heatmap").then(r => r.json())
+                    fetch("/api/leetcode-stats").then(r => r.json()) as Promise<LeetcodeStats>,
+                    fetch("/api/leetcode-heatmap").then(r => r.ok ? r.json() : { daily: [], weekly: [] }) as Promise<LeetcodeHeatmapApiResponse>,
+                    fetch("/api/github-stats").then(r => r.json()) as Promise<GithubStats>,
+                    fetch("/api/github-heatmap").then(r => r.json()) as Promise<HeatmapValue[]>
                 ]);
 
                 setLeetcode(leet);
@@ -50,6 +81,37 @@ export default function Statspage() {
         fetchStats();
     }, []);
 
+    const { totalLeetcodeLast30Days, totalGithubLast30Days, totalGithubCommitsLastYear } = useMemo(() => {
+        const today = new Date();
+        const thirtyDaysAgo = subDays(today, 29);
+
+        let leetcodeSumLast30Days = 0;
+        let githubSumLast30Days = 0;
+        let githubSumLastYear = 0;
+
+        leetcodeHeatmap.forEach(item => {
+            const itemDate = new Date(item.date);
+            if (itemDate >= thirtyDaysAgo && itemDate <= today) {
+                leetcodeSumLast30Days += item.count;
+            }
+        });
+
+        githubHeatmap.forEach(item => {
+            const itemDate = new Date(item.date);
+            if (itemDate >= thirtyDaysAgo && itemDate <= today) {
+                githubSumLast30Days += item.count;
+            }
+            githubSumLastYear += item.count;
+        });
+
+        return {
+            totalLeetcodeLast30Days: leetcodeSumLast30Days,
+            totalGithubLast30Days: githubSumLast30Days,
+            totalGithubCommitsLastYear: githubSumLastYear,
+        };
+    }, [leetcodeHeatmap, githubHeatmap]);
+
+
     const chartData = useMemo(() => {
         return Array.from({ length: 14 }, (_, i) => {
             const date = subDays(new Date(), 13 - i);
@@ -60,7 +122,9 @@ export default function Statspage() {
             let githubCount = 0;
             if (github?.weeklyCommits) {
                 if (Array.isArray(github.weeklyCommits) && github.weeklyCommits.length > 0) {
-                    const githubEntry = github.weeklyCommits.find((entry: any) => entry.date === dateKey);
+                    const githubEntry = github.weeklyCommits.find(
+                        (entry: { date: string; count: number }) => entry.date === dateKey
+                    );
                     githubCount = githubEntry?.count || 0;
                 } else if (github.dailyCommits) {
                     githubCount = github.dailyCommits[dateKey] || 0;
@@ -71,30 +135,43 @@ export default function Statspage() {
                 label: format(date, "MMM d"),
                 leetcode: leetcodeCount,
                 github: githubCount,
-            };
+            } as ChartDataPoint;
         });
     }, [leetcodeWeekly, github]);
 
     const heatmapData = useMemo(() => {
-        if (heatmapType === "github") return githubHeatmap;
-        if (heatmapType === "leetcode") return leetcodeHeatmap;
+        const today = new Date();
+        const oneYearAgo = subDays(today, 365);
 
-        const mergedMap: Record<string, number> = {};
+        const allDatesMap: Record<string, HeatmapValue> = {};
+        let currentDate = new Date(oneYearAgo);
+        while (currentDate <= today) {
+            const dateString = format(currentDate, 'yyyy-MM-dd');
+            allDatesMap[dateString] = { date: dateString, count: 0 };
+            currentDate = addDays(currentDate, 1);
+        }
 
-        githubHeatmap.forEach(({ date, count }) => {
-            mergedMap[date] = (mergedMap[date] || 0) + count;
+        const dataToProcess: HeatmapValue[] =
+            heatmapType === "github"
+                ? githubHeatmap
+                : heatmapType === "leetcode"
+                    ? leetcodeHeatmap
+                    : [...githubHeatmap, ...leetcodeHeatmap];
+
+        dataToProcess.forEach(({ date, count }) => {
+            if (allDatesMap[date]) {
+                if (heatmapType === "combined") {
+                    allDatesMap[date].count += count;
+                } else {
+                    allDatesMap[date].count = count;
+                }
+            }
         });
 
-        leetcodeHeatmap.forEach(({ date, count }) => {
-            mergedMap[date] = (mergedMap[date] || 0) + count;
-        });
-
-        return Object.entries(mergedMap)
-            .map(([date, count]) => ({ date, count }))
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        return Object.values(allDatesMap).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     }, [heatmapType, githubHeatmap, leetcodeHeatmap]);
 
-    if (!leetcode || !github || leetcodeHeatmap.length === 0) {
+    if (!leetcode || !github || leetcodeHeatmap.length === 0 || githubHeatmap.length === 0) {
         return (
             <motion.div
                 className="p-12 flex justify-center items-center gap-2"
@@ -133,60 +210,44 @@ export default function Statspage() {
 
     return (
         <motion.div
-            className="max-w-[950px] mx-auto px-6 space-y-6 font-mono"
+            className="max-w-[950px] mx-auto px-6 space-y-6 font-mono mt-12 md:mt-0"
             initial="hidden"
             animate="visible"
             variants={{ visible: { transition: { staggerChildren: 0.3 } } }}
-        >   
-            <div className="w-full max-w-[950px] bg-zinc-200/10 rounded-2xl px-14 py-10 flex justify-between items-center shadow-md flex-col sm:flex-row gap-6 sm:gap-0">
-                <div className="flex items-center gap-4">
-                    <img
-                        src={user.img}
-                        alt="profile"
-                        className="w-24 h-24 rounded-full object-cover shadow-md shadow-zinc-400 hover:scale-105 hover:shadow-2xl transition-all duration-300 ease-in-out"
-                    />
-                    <div>
-                        <h2 className="text-xl mt-2 font-semibold font-mono">{user.username}</h2>
-                        <div className=" flex flex-col text-sm text-gray-500">
-                            <a
-                                href={`https://github.com/${user.github}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="hover:underline"
-                            >
-                            GitHub: {user.github}
-                            </a>
-                            <a
-                                href={`https://leetcode.com/${user.leetcode}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="hover:underline"
-                            >
-                            LeetCode: {user.leetcode}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right Section - Bio */}
-                <div className="text-right max-w-[220px]">
-                    <h3 className="text-xs text-gray-500 mb-1 text-justify">Bio</h3>
-                    <p className="text-[15px] italic font-sans font-medium tracking-tight text-justify">
-                        {user.bio}
-                    </p>
-                </div>
-                </div>
-
+        >
+            <div>
+                <UserProfileCard user={user} />
+            </div>
 
             <motion.div
                 className="bg-zinc-200/10 rounded-2xl max-w-5xl px-6 py-6 shadow-md"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-            >   
-                <h1 className="text-lg font-semibold font-sans tracking-wide">Statistics</h1>
+            >
+                <div className="flex items-center gap-1">
+                    <h1 className="text-[19px] font-semibold font-sans tracking-wide mb-1">Statistics</h1>
+                    <span
+                        data-tooltip-id="info-tooltip"
+                        data-tooltip-content="Github activity data is limited to the past 365 days - avishekxd"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="0.75"
+                            stroke="currentColor"
+                            className="w-4 h-4 text-gray-500 hover:text-zinc-950 transition-colors duration-200 ease-in-out"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                            />
+                        </svg>
+                    </span>
+                </div>
 
-                {/* Stat Cards */}
                 <motion.div
                     className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4"
                     initial="hidden"
@@ -195,9 +256,9 @@ export default function Statspage() {
                 >
                     {[
                         <StatCard key="1" label="LeetCode Solved" value={leetcode.totalSolved} />,
-                        <StatCard key="2" label="GitHub Commits" value={github.totalCommits} />,
-                        <StatCard key="3" label="Rank" value={`#${leetcode.ranking}`} />,
-                        <StatCard key="4" label="Points" value={leetcode.contributionPoints} />
+                        <StatCard key="2" label="GitHub Commits" value={totalGithubCommitsLastYear} />,
+                        <StatCard key="3" label="Solves (30d)" value={totalLeetcodeLast30Days} />,
+                        <StatCard key="4" label="Commits (30d)" value={totalGithubLast30Days} />
                     ].map((card, i) => (
                         <motion.div
                             key={i}
@@ -210,7 +271,6 @@ export default function Statspage() {
                     ))}
                 </motion.div>
 
-                {/* Heatmap Section */}
                 <motion.div
                     className="mt-6 bg-white rounded-2xl px-6 py-6 shadow-md"
                     initial={{ opacity: 0, y: 20 }}
@@ -220,15 +280,15 @@ export default function Statspage() {
                     <div className="flex justify-between items-center flex-wrap gap-2">
                         <h2 className="text-lg font-semibold font-sans">
                             {heatmapType === "combined"
-                                ? "LeetCode + GitHub Heatmap (Past Year)"
+                                ? "LeetCode + GitHub (Past Year)"
                                 : heatmapType === "leetcode"
-                                    ? "LeetCode Heatmap (Past Year)"
-                                    : "GitHub Heatmap (Past Year)"}
+                                    ? "LeetCode (Past Year)"
+                                    : "GitHub (Past Year)"}
                         </h2>
                         <select
                             value={heatmapType}
                             onChange={e => setHeatmapType(e.target.value as HeatmapType)}
-                            className="text-sm px-3 py-1 rounded-md border bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                            className="text-sm px-3 py-1 mb-2 rounded-md border bg-gray-50/75 hover:bg-gray-100/75 transition-all duration-300 ease-in focus:outline-none focus:ring-1 focus:ring-gray-200"
                         >
                             <option value="combined">LeetCode + GitHub</option>
                             <option value="leetcode">LeetCode</option>
@@ -248,7 +308,6 @@ export default function Statspage() {
                         </motion.div>
                     </AnimatePresence>
 
-                    {/* Legend */}
                     <div className="flex justify-end items-center gap-1 mt-4 text-xs md:text-sm px-2">
                         <span className="flex items-center">Less
                             <span className="w-3 h-3 rounded-sm bg-[#f5f5f5] ml-2"></span>
@@ -263,9 +322,8 @@ export default function Statspage() {
                     <ReactTooltip id="info-tooltip" place="top" />
                 </motion.div>
 
-                {/* Weekly Chart */}
                 <motion.div
-                    className="mt-6 bg-white rounded-2xl px-6 py-6 shadow-md"
+                    className="mt-6 bg-white rounded-2xl px-6 py-6 mb-4 shadow-md"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, ease: "easeOut", delay: 1.4 }}
