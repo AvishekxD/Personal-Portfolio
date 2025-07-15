@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { format, subDays, isAfter } from "date-fns";
+import { format, subDays, isAfter, parseISO } from "date-fns";
 
 interface GithubCommit {
   sha: string;
@@ -14,8 +14,8 @@ interface PushEventPayload {
 interface GithubEvent {
   id: string;
   type: string;
-  actor: { login: string; display_login: string; };
-  repo: { name: string; };
+  actor: { login: string; display_login: string };
+  repo: { name: string };
   created_at: string;
   payload: PushEventPayload;
 }
@@ -50,7 +50,6 @@ export async function GET() {
     }
 
     const events: GithubEvent[] = await res.json();
-
     const commits = events.filter((e): e is GithubEvent => e.type === "PushEvent");
 
     const now = new Date();
@@ -63,12 +62,19 @@ export async function GET() {
       dailyMap[key] = 0;
     }
 
+    const todayKey = format(now, "yyyy-MM-dd");
+    if (!(todayKey in dailyMap)) {
+      dailyMap[todayKey] = 0;
+    }
+
     for (const event of commits) {
-      const commitDate = new Date(event.created_at);
-      if (isAfter(commitDate, twoWeeksAgo) || format(commitDate, "yyyy-MM-dd") === format(twoWeeksAgo, "yyyy-MM-dd")) {
-        const key = format(commitDate, "yyyy-MM-dd");
-        if (dailyMap[key] !== undefined) {
-          dailyMap[key] += event.payload.commits?.length || 0;
+      const commitDate = parseISO(event.created_at);
+      const dateKey = format(commitDate, "yyyy-MM-dd");
+
+      if (isAfter(commitDate, subDays(now, 14)) || dateKey === format(twoWeeksAgo, "yyyy-MM-dd")) {
+        if (dailyMap[dateKey] !== undefined) {
+          const commitCount = event.payload.commits?.length || 0;
+          dailyMap[dateKey] += commitCount;
         }
       }
     }
@@ -77,10 +83,7 @@ export async function GET() {
       .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
       .map(([date, count]) => ({ date, count }));
 
-    const totalCommits = commits.reduce(
-      (sum: number, e: GithubEvent) => sum + (e.payload.commits?.length || 0),
-      0
-    );
+    const totalCommits = commits.reduce((sum, e) => sum + (e.payload.commits?.length || 0), 0);
 
     return NextResponse.json<GithubStatsResponse>({
       totalCommits,

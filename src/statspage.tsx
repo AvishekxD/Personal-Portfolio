@@ -120,17 +120,8 @@ export default function Statspage() {
             const leetcodeCount =
                 leetcodeHeatmap.find((d) => d.date === dateKey)?.count || 0;
 
-            let githubCount = 0;
-            if (github?.dailyCommits && github.dailyCommits[dateKey] !== undefined) {
-                githubCount = github.dailyCommits[dateKey];
-            } else if (
-                github &&
-                Array.isArray(github.weeklyCommits) &&
-                github.weeklyCommits.length > 0
-            ) {
-                const gitEntry = github.weeklyCommits.find(w => w.date === dateKey);
-                githubCount = gitEntry?.count || 0;
-            }
+            const githubCount =
+                githubHeatmap.find((d) => d.date === dateKey)?.count || 0;
 
             return {
                 label: format(date, "MMM d"),
@@ -138,7 +129,9 @@ export default function Statspage() {
                 github: githubCount,
             } as ChartDataPoint;
         });
-    }, [leetcodeHeatmap, github]);
+    }, [leetcodeHeatmap, githubHeatmap]);
+
+
 
     const heatmapData = useMemo(() => {
         const today = new Date();
