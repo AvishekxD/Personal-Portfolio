@@ -1,57 +1,69 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-interface LeetCodeApiData {
-  totalSolved: number;
-  easySolved: number;
-  mediumSolved: number;
-  hardSolved: number;
-  ranking: number;
-  contributionPoints?: number;
-  message?: string;
-  status?: string;
-}
+type SubmissionStat = {
+  difficulty: "All" | "Easy" | "Medium" | "Hard";
+  count: number;
+};
 
-interface LeetCodeStatsResponse {
-  totalSolved: number;
-  easySolved: number;
-  mediumSolved: number;
-  hardSolved: number;
-  ranking: number;
-  contributionPoints?: number;
+interface LeetCodeAPIResponse {
+  data: {
+    matchedUser: {
+      submitStatsGlobal: {
+        acSubmissionNum: SubmissionStat[];
+      };
+    } | null;
+  };
 }
 
 export async function GET() {
-  const username = 'AvishekzZ';
+  const username = "AvishekzZ";
+
+  const query = {
+    operationName: "getUserProfile",
+    query: `
+      query getUserProfile($username: String!) {
+        matchedUser(username: $username) {
+          submitStatsGlobal {
+            acSubmissionNum {
+              difficulty
+              count
+            }
+          }
+        }
+      }
+    `,
+    variables: { username },
+  };
 
   try {
-    const res = await fetch(`https://leetcode-stats-api.herokuapp.com/${username}`, {
+    const res = await fetch("https://leetcode.com/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Referer: `https://leetcode.com/${username}/`,
+      },
+      body: JSON.stringify(query),
       next: { revalidate: 1800 },
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      console.error(`Failed to fetch LeetCode stats from external API: Status ${res.status}, Response: ${errorText}`);
-      return NextResponse.json({ error: 'Failed to fetch LeetCode stats', details: errorText }, { status: res.status });
+      return NextResponse.json({ error: "LeetCode API error" }, { status: res.status });
     }
 
-    const data: LeetCodeApiData = await res.json();
+    const json: LeetCodeAPIResponse = await res.json();
 
-    if (typeof data.totalSolved !== 'number' || typeof data.ranking !== 'number') {
-      console.error('Received malformed data from LeetCode stats API:', data);
-      return NextResponse.json({ error: 'Malformed data received from LeetCode stats API' }, { status: 500 });
-    }
+    const submissions = json.data?.matchedUser?.submitStatsGlobal?.acSubmissionNum ?? [];
 
-    return NextResponse.json<LeetCodeStatsResponse>({
-      totalSolved: data.totalSolved,
-      easySolved: data.easySolved,
-      mediumSolved: data.mediumSolved,
-      hardSolved: data.hardSolved,
-      ranking: data.ranking,
-      contributionPoints: data.contributionPoints,
+    const findCount = (difficulty: SubmissionStat["difficulty"]): number =>
+      submissions.find((s) => s.difficulty === difficulty)?.count ?? 0;
+
+    return NextResponse.json({
+      totalSolved: findCount("All"),
+      easySolved: findCount("Easy"),
+      mediumSolved: findCount("Medium"),
+      hardSolved: findCount("Hard"),
     });
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-    console.error('Unexpected error fetching LeetCode stats:', errorMessage);
-    return NextResponse.json({ error: 'Unexpected error fetching LeetCode stats', details: errorMessage }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }

@@ -2,43 +2,39 @@ import { NextResponse } from "next/server";
 import { startOfWeek, parseISO } from "date-fns";
 
 interface LeetcodeRawSubmissionCalendar {
-    [timestamp: string]: number;
-}
-
-interface LeetcodeUserCalendar {
-    submissionCalendar: string;
-}
-
-interface LeetcodeMatchedUser {
-    userCalendar: LeetcodeUserCalendar;
+  [timestamp: string]: number;
 }
 
 interface LeetcodeGraphQLResponse {
-    data?: {
-        matchedUser?: LeetcodeMatchedUser;
+  data?: {
+    matchedUser?: {
+      userCalendar?: {
+        submissionCalendar?: string;
+      };
     };
-    errors?: { message: string }[];
+  };
+  errors?: { message: string }[];
 }
 
 interface DailyCount {
-    date: string;
-    count: number;
+  date: string;
+  count: number;
 }
 
 interface WeeklyCount {
-    week: string;
-    count: number;
+  week: string;
+  count: number;
 }
 
 interface LeetcodeHeatmapApiResponse {
-    daily: DailyCount[];
-    weekly: WeeklyCount[];
+  daily: DailyCount[];
+  weekly: WeeklyCount[];
 }
 
 export async function GET() {
-    const username = process.env.LEETCODE_USERNAME || "AvishekzZ";
+  const username = process.env.LEETCODE_USERNAME || "AvishekzZ";
 
-    const query = `
+  const query = `
     query userProfileCalendar($username: String!) {
       matchedUser(username: $username) {
         userCalendar {
@@ -48,81 +44,69 @@ export async function GET() {
     }
   `;
 
-    try {
-        const res = await fetch("https://leetcode.com/graphql", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Referer": "https://leetcode.com",
-            },
-            body: JSON.stringify({
-                query,
-                variables: { username },
-            }),
-            next: { revalidate: 1800 },
-        });
+  try {
+    const res = await fetch("https://leetcode.com/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Referer": "https://leetcode.com",
+      },
+      body: JSON.stringify({ query, variables: { username } }),
+      next: { revalidate: 1800 },
+    });
 
-        if (!res.ok) {
-            const errorText = await res.text();
-            console.error(`Failed to fetch: ${res.status} - ${res.statusText} - ${errorText}`);
-            return NextResponse.json(
-                {
-                    error: "Failed to fetch from LeetCode",
-                    details: errorText,
-                },
-                { status: res.status }
-            );
-        }
-
-        const data: LeetcodeGraphQLResponse = await res.json();
-
-        if (data.errors && data.errors.length > 0) {
-            console.error("GraphQL errors:", data.errors);
-            return NextResponse.json(
-                { error: "LeetCode GraphQL returned errors", details: data.errors },
-                { status: 500 }
-            );
-        }
-
-        const calendarString = data.data?.matchedUser?.userCalendar?.submissionCalendar;
-
-        if (!calendarString || typeof calendarString !== "string") {
-            console.error("submissionCalendar missing or invalid", data);
-            return NextResponse.json(
-                { error: "submissionCalendar missing or invalid", details: data },
-                { status: 500 }
-            );
-        }
-
-        const raw: LeetcodeRawSubmissionCalendar = JSON.parse(calendarString);
-
-        const daily: DailyCount[] = Object.entries(raw)
-            .map(([timestamp, count]) => ({
-                date: new Date(Number(timestamp) * 1000).toISOString().split("T")[0],
-                count: Number(count),
-            }))
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-        const weeklyMap: Record<string, number> = {};
-        for (const { date, count } of daily) {
-            const week = startOfWeek(parseISO(date), { weekStartsOn: 1 }).toISOString().split("T")[0];
-            weeklyMap[week] = (weeklyMap[week] || 0) + count;
-        }
-
-        const weekly: WeeklyCount[] = Object.entries(weeklyMap)
-            .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
-            .map(([week, count]) => ({ week, count }));
-
-        return NextResponse.json<LeetcodeHeatmapApiResponse>({ daily, weekly });
-    } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "Unknown error";
-        console.error("Unexpected error:", errorMessage);
-        return NextResponse.json(
-            {
-                error: "Unexpected server error",
-                details: errorMessage,
-            },
-            { status: 500 }
-        );
+    if (!res.ok) {
+      const errorText = await res.text();
+      return NextResponse.json(
+        { error: "Failed to fetch from LeetCode", details: errorText },
+        { status: res.status }
+      );
     }
+
+    const json: LeetcodeGraphQLResponse = await res.json();
+    const calendarString = json.data?.matchedUser?.userCalendar?.submissionCalendar;
+
+    if (!calendarString || typeof calendarString !== "string") {
+      return NextResponse.json(
+        { error: "submissionCalendar missing or invalid", details: json },
+        { status: 500 }
+      );
+    }
+
+    const raw: LeetcodeRawSubmissionCalendar = JSON.parse(calendarString);
+
+    const daily: DailyCount[] = Object.entries(raw)
+      .map(([timestamp, count]) => {
+        const istOffsetSeconds = 5.5 * 3600;
+        const date = new Date((Number(timestamp) + istOffsetSeconds) * 1000)
+          .toISOString()
+          .split("T")[0];
+
+        return { date, count: Number(count) };
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    const weeklyMap: Record<string, number> = {};
+
+    for (const { date, count } of daily) {
+      const weekStart = startOfWeek(parseISO(date), { weekStartsOn: 1 })
+        .toISOString()
+        .split("T")[0];
+
+      weeklyMap[weekStart] = (weeklyMap[weekStart] || 0) + count;
+    }
+
+    const weekly: WeeklyCount[] = Object.entries(weeklyMap)
+      .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
+      .map(([week, count]) => ({ week, count }));
+
+    return NextResponse.json<LeetcodeHeatmapApiResponse>({ daily, weekly });
+  } catch (err) {
+    const errorMessage =
+      err instanceof Error ? err.message : "Unknown error during fetch";
+    return NextResponse.json(
+      { error: "Unexpected server error", details: errorMessage },
+      { status: 500 }
+    );
+  }
 }

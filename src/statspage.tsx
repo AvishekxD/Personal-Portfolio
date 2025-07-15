@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import StatCard from "@/components/Stats/StatCard";
 import HeatmapCalendar from "@/components/Stats/HeatmapCalendar";
 import WeeklyStatsChart from "@/components/Stats/WeeklyStatsChart";
-import { subDays, format, addDays } from "date-fns";
+import { subDays, format, addDays, startOfWeek } from "date-fns";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import UserProfileCard from "@/components/Stats/UserProfileCard";
 
@@ -117,18 +117,19 @@ export default function Statspage() {
             const date = subDays(new Date(), 13 - i);
             const dateKey = format(date, "yyyy-MM-dd");
 
-            const leetcodeCount = leetcodeWeekly.find(w => w.week === dateKey)?.count || 0;
+            const leetcodeCount =
+                leetcodeHeatmap.find((d) => d.date === dateKey)?.count || 0;
 
             let githubCount = 0;
-            if (github?.weeklyCommits) {
-                if (Array.isArray(github.weeklyCommits) && github.weeklyCommits.length > 0) {
-                    const githubEntry = github.weeklyCommits.find(
-                        (entry: { date: string; count: number }) => entry.date === dateKey
-                    );
-                    githubCount = githubEntry?.count || 0;
-                } else if (github.dailyCommits) {
-                    githubCount = github.dailyCommits[dateKey] || 0;
-                }
+            if (github?.dailyCommits && github.dailyCommits[dateKey] !== undefined) {
+                githubCount = github.dailyCommits[dateKey];
+            } else if (
+                github &&
+                Array.isArray(github.weeklyCommits) &&
+                github.weeklyCommits.length > 0
+            ) {
+                const gitEntry = github.weeklyCommits.find(w => w.date === dateKey);
+                githubCount = gitEntry?.count || 0;
             }
 
             return {
@@ -137,7 +138,7 @@ export default function Statspage() {
                 github: githubCount,
             } as ChartDataPoint;
         });
-    }, [leetcodeWeekly, github]);
+    }, [leetcodeHeatmap, github]);
 
     const heatmapData = useMemo(() => {
         const today = new Date();
