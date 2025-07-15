@@ -210,6 +210,7 @@ export default function Statspage() {
 
     return (
         <motion.div
+            id="stats"
             className="max-w-[950px] mx-auto px-6 space-y-6 font-mono mt-12 md:mt-0"
             initial="hidden"
             animate="visible"

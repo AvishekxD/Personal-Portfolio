@@ -13,7 +13,6 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
   const words = [
     "You’ve reached the end! Time for a coffee?",
     "All done! Time to relax and scroll back up.",
-    "You scrolled faster than a cat chasing a laser!",
   ];
 
   return (
@@ -58,14 +57,14 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
                   c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
               />
             </svg>
-            by the <span className="font-semibold ml-1.5">AvishekxD</span>
+            by<span className="font-semibold ml-1.5">AvishekxD</span>
           </div>
 
           <a
             href="https://github.com/AvishekxD"
             rel="noopener noreferrer"
             target="_blank"
-            className="text-gray-700 dark:text-white hover:text-zinc-500 dark:hover:text-zinc-400"
+            className="text-gray-700 dark:text-white hover:text-zinc-500 dark:hover:text-zinc-400 -ml-3 mb-0.5"
             aria-label="GitHub"
           >
             <svg

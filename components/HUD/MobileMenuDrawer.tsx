@@ -11,6 +11,7 @@ const navItems = [
   { name: "About", link: "#about", external: false },
   { name: "Projects", link: "#projects", external: false },
   { name: "Github", link: "https://www.github.com/AvishekxD", external: true },
+  { name: "stats", link: "#stats", external: false },
   { name: "Contact", link: "#contact", external: false },
 ];
 

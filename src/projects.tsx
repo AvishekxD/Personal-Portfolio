@@ -83,7 +83,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ className = "" }) => 
     });
 
     return (
-        <section className={`min-h-screen px-4 md:-mt-16 ${className}`}>
+        <section id="projects" className={`min-h-screen px-4 md:-mt-16 ${className}`}>
             {/* Top Section (Posters) */}
             <motion.div
                 ref={topRef}
