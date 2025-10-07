@@ -60,7 +60,7 @@ const testimonials = [
         imageUrl: "/assets/projectsImages/Ai-Simplify.png",
         quote:
             "AI powered Chrome extension that uses AI to summarize content from Research papers, articles, news, blogs.",
-        name: "Ai-Simplify",
+        name: "AI-Simplify",
         technologies: [
             "JavaScript",
             "TailwindCSS",
@@ -68,6 +68,19 @@ const testimonials = [
             "Gemini",
         ],
         url: "https://github.com/AvishekxD/AI-Simplify-chrome_extension",
+    },
+    {
+        imageUrl: "/assets/projectsImages/LeetHelp.gif",
+        quote:
+            "A Chrome Extension to translate LeetCode problems from English into blended multi-languages for easier and fast understanding.",
+        name: "LeetHelp",
+        technologies: [
+            "chrome-extension",
+            "Leetcode",
+            "Gemini",
+            "JavaScript",
+        ],
+        url: "https://github.com/AvishekxD/LeetHelp",
     },
 ];
 

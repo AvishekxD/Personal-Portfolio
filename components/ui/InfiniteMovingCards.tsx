@@ -13,6 +13,7 @@ const techIconMap: { [key: string]: string } = {
   "Next.js": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
   "TailwindCSS": "/assets/Tailwind_CSS_Logo.svg",
   "chrome-extension": "/assets/Google_Chrome.svg",
+  "Leetcode": "/assets/Leetcode.png",
   "clerk": "/assets/clerk.svg",
   "Gemini" : "/assets/gemini.svg",
   "Zustand": "https://raw.githubusercontent.com/pmndrs/zustand/main/docs/images/logo.png",
