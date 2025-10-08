@@ -114,6 +114,7 @@ export const InfiniteMovingCards = ({
                   alt={item.name}
                   width={320}
                   height={180}
+                  unoptimized
                   className="rounded-md object-cover aspect-video mb-4 mt-2 w-full shadow-md hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out shadow-neutral-700"
                 />
               </a>
