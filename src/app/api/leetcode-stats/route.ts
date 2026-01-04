@@ -16,7 +16,7 @@ interface LeetCodeAPIResponse {
 }
 
 export async function GET() {
-  const username = "AvishekzZ";
+  const username = "AvishekxD";
 
   const query = {
     operationName: "getUserProfile",

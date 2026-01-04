@@ -32,7 +32,7 @@ interface LeetcodeHeatmapApiResponse {
 }
 
 export async function GET() {
-  const username = process.env.LEETCODE_USERNAME || "AvishekzZ";
+  const username = process.env.LEETCODE_USERNAME || "AvishekxD";
 
   const query = `
     query userProfileCalendar($username: String!) {

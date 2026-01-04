@@ -62,7 +62,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ className = "" }) => {
                             <button className="spark-button cursor-pointer">
                                 <span className="spark-glow"></span>
                                 <span className="spark-backdrop"></span>
-                                <span className="spark-text py-1.5 px-8 sm:py-0.5 sm:px-10 tracking-wide text-sm sm:text-base">
+                                <span className="spark-text z-1 py-1.5 px-8 sm:py-0.5 sm:px-10 tracking-wide text-sm sm:text-base">
                                     Resume
                                 </span>
                             </button>

@@ -54,7 +54,7 @@ export default function Statspage() {
         username: "avishekxd",
         img: "/assets/avishekxd.png",
         github: "AvishekxD",
-        leetcode: "AvishekzZ",
+        leetcode: "AvishekxD",
         bio: "The hardest choices require the strongest wills.",
         emoji: "🎈",
     };

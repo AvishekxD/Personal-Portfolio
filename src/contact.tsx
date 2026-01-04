@@ -75,11 +75,11 @@ export default function Contact() {
                 >
                     <button
                         onClick={() => setIsFormVisible(prev => !prev)}
-                        className="bg-black text-white rounded-md hover:bg-zinc-800 transition-all duration-300 spark-button cursor-pointer"
+                        className="bg-black rounded-md hover:bg-zinc-800 transition-all duration-300 spark-button cursor-pointer"
                     >
                         <span className="spark-glow"></span>
                         <span className="spark-backdrop"></span>
-                        <span className="spark-text py-1.5 px-8 sm:py-0.5 sm:px-10 tracking-wide text-sm sm:text-base">
+                        <span className="z-1 py-1.5 px-8 sm:py-0.5 sm:px-10 tracking-wide text-sm sm:text-base">
                             {isFormVisible ? "Social Links" : "Send a Message"}
                         </span>
                     </button>
@@ -145,7 +145,7 @@ export default function Contact() {
                             {[
                                 { href: "https://github.com/AvishekxD", icon: <FaGithub className="text-2xl" />, label: "GitHub" },
                                 { href: "https://linkedin.com/in/avishek-meena/", icon: <FaLinkedin className="text-2xl text-blue-600" />, label: "LinkedIn" },
-                                { href: "https://twitter.com/AvishekzZ_", icon: <FaTwitter className="text-2xl text-sky-500" />, label: "Twitter" }
+                                { href: "https://twitter.com/AvishekxD", icon: <FaTwitter className="text-2xl text-sky-500" />, label: "Twitter" }
                             ].map((link, i) => (
                                 <motion.a
                                     key={i}

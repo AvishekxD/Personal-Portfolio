@@ -14,7 +14,7 @@ import ScrollToTopButton from '@/components/ScrollToTopButton';
 
 
 export const metadata: Metadata = {
-  title: "Abhishek Meena — Portfolio",
+  title: "Abhishek Meena - Portfolio",
   description: "portfolio",
    icons: {
     icon: "/assets/favicon/favicon.svg",        

@@ -240,7 +240,7 @@ html {
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  mask: linear-gradient(white, transparent 50%);
+  mask: linear-gradient(rgb(0, 0, 0), transparent 50%);
   animation: spark-flip calc(var(--spark-duration) * 2) infinite steps(2, end);
 }
 
